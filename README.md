@@ -2,21 +2,6 @@
 
 A clothing dating app that displays articles of clothing based on preferences. Swipe to discard or save into your closet where you can digitally try on your clothing via AI.
 
-## Project Structure
-
-```
-wearhouse/
-├── backend/          # Flask API
-└── frontend/         # Next.js app
-```
-
-## Features
-
-- **Clothing Selection**: Browse clothing items based on your preferences
-- **Digital Closet**: Save your favorite items to your personal collection
-- **AI Try-On**: Use AI to virtually try on clothing combinations
-- **Style Ideas**: Get wear and thrift flip ideas for each item
-
 ## Technologies
 
 ### Frontend
@@ -93,6 +78,13 @@ Frontend will run on `http://localhost:3000`
 - Password
 - Closet (collection of individual items)
 - Outfits (collection of pictures)
+
+## Timeline
+
+- **Week 1**: Final designs, setup repositories, data model
+- **Week 2-3**: Development
+- **Week 4**: Finalization and deployment on Vercel
+- **Dec 5**: Launch!
 
 ## Team
 
