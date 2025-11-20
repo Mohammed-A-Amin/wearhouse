@@ -5,8 +5,8 @@ load_dotenv()
 
 class Config:
     """Flask configuration"""
-    SECRET_KEY = os.environ.get('SECRET_KEY') or 'dev-secret-key-change-in-production'
-    MONGODB_URI = os.environ.get('MONGODB_URI') or 'mongodb://localhost:27017/wearhouse'
+    SECRET_KEY = os.environ.get('SECRET_KEY') 
+    MONGO_URI = os.environ.get('MONGO_URI') 
     GEMINI_API_KEY = os.environ.get('GEMINI_API_KEY')
     
     # Flask settings

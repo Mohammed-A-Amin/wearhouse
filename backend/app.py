@@ -1,15 +1,29 @@
 from flask import Flask, jsonify
 from flask_cors import CORS
+from flask_pymongo import PyMongo
 from config import Config
 
 app = Flask(__name__)
 app.config.from_object(Config)
 CORS(app)
 
+# Initialize MongoDB
+mongo = PyMongo(app)
+
 @app.route('/api/health', methods=['GET'])
 def health_check():
     """Health check endpoint"""
-    return jsonify({'status': 'healthy', 'message': 'Wearhouse API is running'}), 200
+    try:
+        mongo.db.command('ping')
+        db_status = 'connected'
+    except Exception as e:
+        db_status = f'disconnected: {str(e)}'
+    
+    return jsonify({
+        'status': 'healthy', 
+        'message': 'Wearhouse API is running',
+        'database': db_status
+    }), 200
 
 @app.route('/api', methods=['GET'])
 def api_root():

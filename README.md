@@ -69,7 +69,7 @@ Backend will run on `http://localhost:5000`
 
 1. Navigate to the frontend directory:
 ```bash
-cd frontend
+cd wearhouse-frontend
 ```
 
 2. Install dependencies:
@@ -93,13 +93,6 @@ Frontend will run on `http://localhost:3000`
 - Password
 - Closet (collection of individual items)
 - Outfits (collection of pictures)
-
-## Timeline
-
-- **Week 1**: Final designs, setup repositories, data model
-- **Week 2-3**: Development
-- **Week 4**: Finalization and deployment on Vercel
-- **Dec 5**: Launch!
 
 ## Team
 
