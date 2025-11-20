@@ -7,7 +7,6 @@ app = Flask(__name__)
 app.config.from_object(Config)
 CORS(app)
 
-# Initialize MongoDB
 mongo = PyMongo(app)
 
 @app.route('/api/health', methods=['GET'])
