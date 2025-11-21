@@ -1,5 +1,7 @@
+import TestLogin from "./components/test";
+
 export default function Home() {
   return (
-    <div>YOU ARE LOGGED IN</div>
+    <TestLogin></TestLogin>
   );
 }
