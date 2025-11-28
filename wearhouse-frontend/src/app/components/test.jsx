@@ -18,8 +18,6 @@ export default async function TestLogin() {
   });
 
   if (!res.ok){
-    const errorData = await res.json(); // Try to get the error details from Flask
-    console.log("SERVER ERROR:", res.status, errorData);
     return <div>Error loading profile</div>;
   }
 
