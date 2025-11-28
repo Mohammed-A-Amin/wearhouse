@@ -10,14 +10,18 @@ export default async function TestLogin() {
 
   const token = await getToken();
 
-  const res = await fetch("http://127.0.0.1:5000/api/me", {
+  const res = await fetch("http://127.0.0.1:8080/api/me", {
     headers: {
       Authorization: `Bearer ${token}`,
     },
     cache: "no-store",
   });
 
-  if (!res.ok) return <div>Error loading profile</div>;
+  if (!res.ok){
+    const errorData = await res.json(); // Try to get the error details from Flask
+    console.log("SERVER ERROR:", res.status, errorData);
+    return <div>Error loading profile</div>;
+  }
 
   const userData = await res.json();
   console.log(userData)
