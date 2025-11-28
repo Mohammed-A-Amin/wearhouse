@@ -20,6 +20,7 @@ export default async function TestLogin() {
   if (!res.ok) return <div>Error loading profile</div>;
 
   const userData = await res.json();
+  console.log(userData)
 
   return (
     <div className="p-10">
