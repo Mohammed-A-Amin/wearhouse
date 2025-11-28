@@ -12,8 +12,6 @@ import certifi
 app = Flask(__name__)
 app.config.from_object(Config)
 CORS(app)
-
-app = Flask(__name__)
 load_dotenv()
 MONGO_URI = os.getenv("MONGO_URI")
 DB_NAME = str(os.getenv("DB_NAME"))
@@ -88,4 +86,4 @@ def api_root():
     }), 200
 
 if __name__ == '__main__':
-    app.run(debug=True, host='0.0.0.0', port=5000)
+    app.run(debug=True, host='0.0.0.0', port=PORT)
