@@ -24,6 +24,7 @@ clerk_sdk = Clerk(bearer_auth=CLERK_SECRET_KEY)
 mongo = MongoClient(MONGO_URI, tlsCAFile=certifi.where())
 db = mongo[DB_NAME]
 
+
 @app.route('/api/me', methods=['GET'])
 def get_my_data():
     auth_header = request.headers.get('Authorization')
@@ -38,7 +39,6 @@ def get_my_data():
         user_id = payload.get("sub")
 
         session = clerk_sdk.sessions.get(session_id=session_id)
-        
         if session.status != "active":
              return jsonify({"error": "Session inactive"}), 401
 
