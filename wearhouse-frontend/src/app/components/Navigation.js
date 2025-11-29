@@ -1,7 +1,8 @@
 "use client";
-
 import Image from "next/image";
 import Link from "next/link";
+import { UserButton } from "@clerk/nextjs";
+
 
 export default function Navigation() {
   return (
@@ -26,8 +27,8 @@ export default function Navigation() {
         </a>
       </nav>
 
-      <button className="ml-8 px-6 py-2 bg-[#d94f6a] text-white rounded-full hover:bg-[#c13f5a] transition text-sm font-medium">
-        User
+      <button className="ml-8 text-white rounded-full transition text-sm font-medium">
+        <UserButton></UserButton>
       </button>
     </header>
   );
