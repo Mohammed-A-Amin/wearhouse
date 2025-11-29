@@ -4,6 +4,15 @@ import { useState, useEffect } from "react";
 import FilterSidebar from "../../components/FilterSidebar";
 import Dropdown from "../../components/Dropdown";
 import Navigation from "../../components/Navigation";
+import { useState } from "react";
+import Image from "next/image";
+import Navigation from "@/app/components/Navigation";
+
+const MOCK_ITEMS = Array.from({ length: 20 }).map((_, i) => ({
+  id: i + 1,
+  name: `Item ${i + 1}`,
+  category: i % 2 === 0 ? "Top" : "Bottom",
+}));
 
 const MOCK_HISTORY = ["Hoodie", "Sneakers", "Jeans", "Jacket", "Hat"];
 
@@ -38,7 +47,7 @@ export default function Page() {
   return (
     <div className="min-h-screen bg-gradient-to-b from-[#FBE7CA] to-[#F2BECB] flex flex-col">
 
-      <Navigation />
+      <Navigation></Navigation>
 
       {/* MAIN CONTENT */}
       <main className="flex-1 flex justify-center py-10">
