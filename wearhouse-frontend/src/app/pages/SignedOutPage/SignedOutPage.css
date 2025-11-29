@@ -1,0 +1,7 @@
+.signed-out{
+    height: 100vh;
+    background: linear-gradient(180deg, #FFC88B 0%, #FF9BAF 100%);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}

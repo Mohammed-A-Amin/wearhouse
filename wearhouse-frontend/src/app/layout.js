@@ -7,6 +7,7 @@ import {
   SignedIn,
   SignedOut,
 } from '@clerk/nextjs'
+import SignedOutPage from "./pages/SignedOutPage/SignedOutPage";
 
 
 const geistSans = Geist({
@@ -32,7 +33,7 @@ export default function RootLayout({ children }) {
           className={`${geistSans.variable} ${geistMono.variable} antialiased`}
         >
         <SignedOut>
-          <SignInButton></SignInButton>
+          <SignedOutPage></SignedOutPage>
         </SignedOut>
         <SignedIn>
           {children}
