@@ -118,67 +118,21 @@ export default function Dashboard() {
 function SearchBar({ query, setQuery }) {
   return (
     <div className="flex items-center justify-center w-full">
-      <div className="relative flex w-full max-w-4xl items-center gap-3">
-        <div className="flex-1 relative">
-          <input
-            type="text"
-            value={query}
-            onChange={(e) => setQuery(e.target.value)}
-            placeholder="Search Closet..."
-            className="w-full py-3.5 pl-5 pr-12 rounded-full border-2 border-[#F8741F] text-[#F8741F] placeholder-[#F8741F]/50 bg-white/70 backdrop-blur-sm shadow-sm focus:outline-none focus:ring-2 focus:ring-[#F8741F]/40 transition"
-          />
+      <div className="relative flex w-full max-w-3xl">
+        <input
+  type="text"
+  value={query}
+  onChange={(e) => setQuery(e.target.value)}
+  placeholder="Search..."
+  className="w-full py-3.5 pl-5 pr-12 rounded-full border-2 border-[#F8741F] text-[#F8741F] placeholder-[#F8741F]/50 bg-white/70 backdrop-blur-sm shadow-sm focus:outline-none focus:ring-2 focus:ring-[#F8741F]/40 transition"
+/>
 
-          <button className="absolute right-3 top-1/2 -translate-y-1/2 text-[#F8741F] hover:text-[#d45f15] transition">
-            <svg className="h-5 w-5" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
-              <circle cx="11" cy="11" r="7" />
-              <line x1="16" y1="16" x2="21" y2="21" />
-            </svg>
-          </button>
-        </div>
-
-        <div className="flex items-center gap-3">
-          <Dropdown label="CATEGORY" panelClass="w-48">
-            <ul className="text-sm text-gray-700">
-              <li className="py-1 px-2 hover:bg-gray-50 rounded">All</li>
-              <li className="py-1 px-2 hover:bg-gray-50 rounded">Top</li>
-              <li className="py-1 px-2 hover:bg-gray-50 rounded">Bottom</li>
-              <li className="py-1 px-2 hover:bg-gray-50 rounded">Outerwear</li>
-              <li className="py-1 px-2 hover:bg-gray-50 rounded">Footwear</li>
-            </ul>
-          </Dropdown>
-
-          <Dropdown label="FILTER" panelClass="w-64">
-            <div className="space-y-3">
-              <h4 className="text-sm font-semibold text-[#D45129]">Colour</h4>
-              <div className="flex flex-wrap gap-2">
-                {['Pink','Green','Blue','Purple','Orange'].map((c) => (
-                  <button key={c} className="px-3 py-1 text-xs bg-[#fff6f0] border border-[#f6cdb8] rounded text-[#a4432f] hover:bg-[#fff0e6]">{c}</button>
-                ))}
-              </div>
-
-              <h4 className="text-sm font-semibold text-[#D45129]">Season</h4>
-              <div className="flex flex-wrap gap-2">
-                {['Fall','Spring','Summer','Winter'].map((s) => (
-                  <button key={s} className="px-3 py-1 text-xs bg-[#fff6f0] border border-[#f6cdb8] rounded text-[#a4432f] hover:bg-[#fff0e6]">{s}</button>
-                ))}
-              </div>
-
-              <h4 className="text-sm font-semibold text-[#D45129]">Style</h4>
-              <div className="flex flex-wrap gap-2">
-                {['Casual','Ethnic','Formal','Sports'].map((st) => (
-                  <button key={st} className="px-3 py-1 text-xs bg-[#fff6f0] border border-[#f6cdb8] rounded text-[#a4432f] hover:bg-[#fff0e6]">{st}</button>
-                ))}
-              </div>
-
-              <h4 className="text-sm font-semibold text-[#D45129]">Gender</h4>
-              <div className="flex flex-wrap gap-2">
-                {['Male','Female','Unisex'].map((g) => (
-                  <button key={g} className="px-3 py-1 text-xs bg-[#fff6f0] border border-[#f6cdb8] rounded text-[#a4432f] hover:bg-[#fff0e6]">{g}</button>
-                ))}
-              </div>
-            </div>
-          </Dropdown>
-        </div>
+        <button className="absolute right-3 top-1/2 -translate-y-1/2 text-[#F8741F] hover:text-[#d45f15] transition">
+          <svg className="h-5 w-5" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+            <circle cx="11" cy="11" r="7" />
+            <line x1="16" y1="16" x2="21" y2="21" />
+          </svg>
+        </button>
       </div>
     </div>
   );
