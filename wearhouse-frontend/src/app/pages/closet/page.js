@@ -3,7 +3,6 @@
 import { useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import FilterSidebar from "../../components/FilterSidebar";
 import Dropdown from "../../components/Dropdown";
 
 const MOCK_ITEMS = Array.from({ length: 20 }).map((_, i) => ({
@@ -77,9 +76,19 @@ export default function Page() {
           </div>
 
           <div className="grid grid-cols-[260px_1fr] gap-6 px-8 py-6">
-            {/* FILTER SIDEBAR */}
-            <div className="px-4">
-              <FilterSidebar />
+            {/* LEFT PREVIEW PANEL */}
+            <div className="flex flex-col items-center">
+              <h2 className="text-3xl font-bold text-[#F06728] mb-4">Today’s Outfit</h2>
+
+              <div className="w-72 h-[500px] bg-[#F4C6D8] border-4 border-[#C43757]"></div>
+
+              <button className="mt-4 w-48 py-2 rounded-md bg-[#D94F6A] text-white text-sm font-medium hover:bg-[#C13F5A] transition">
+                Generate Outfit
+              </button>
+
+              <p className="text-xs text-[#C13F5A] mt-1">
+                Not loading correctly? <span className="underline cursor-pointer">Redraw</span>
+              </p>
             </div>
 
             {/* GRID */}
@@ -115,7 +124,7 @@ function SearchBar({ query, setQuery }) {
 
         <div className="flex items-center gap-3">
           <Dropdown label="CATEGORY" panelClass="w-48">
-            <ul className="text-sm text-gray-700">
+            <ul className="text-sm text-[#5a2a1f]">
               <li className="py-1 px-2 hover:bg-gray-50 rounded">All</li>
               <li className="py-1 px-2 hover:bg-gray-50 rounded">Top</li>
               <li className="py-1 px-2 hover:bg-gray-50 rounded">Bottom</li>
@@ -125,7 +134,7 @@ function SearchBar({ query, setQuery }) {
           </Dropdown>
 
           <Dropdown label="FILTER" panelClass="w-64">
-            <div className="space-y-3">
+            <div className="space-y-3 text-[#5a2a1f]">
               <h4 className="text-sm font-semibold text-[#D45129]">Colour</h4>
               <div className="flex flex-wrap gap-2">
                 {['Pink','Green','Blue','Purple','Orange'].map((c) => (
