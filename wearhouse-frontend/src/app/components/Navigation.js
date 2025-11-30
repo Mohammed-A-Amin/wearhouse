@@ -21,9 +21,9 @@ export default function Navigation() {
         <Link href="/pages/clothing_selection" className="hover:text-[#e05f3f] transition">
           Shop
         </Link>
-        <a href="/closet" className="hover:text-[#e05f3f] transition">
+        <Link href="/pages/closet" className="hover:text-[#e05f3f] transition">
           Closet
-        </a>
+        </Link>
       </nav>
 
       <button className="ml-8 px-6 py-2 bg-[#d94f6a] text-white rounded-full hover:bg-[#c13f5a] transition text-sm font-medium">
