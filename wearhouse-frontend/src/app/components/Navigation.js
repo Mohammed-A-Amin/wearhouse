@@ -2,14 +2,13 @@
 
 import Image from "next/image";
 import Link from "next/link";
+import Dropdown from "./Dropdown";
 
 export default function Navigation() {
   return (
     <header className="h-20 bg-gradient-to-r from-[#fcd0ae] to-[#f7b58b] flex items-center px-10 shadow-md">
       <Link href="/" className="flex items-center gap-3">
-        <div className="w-10 h-10 bg-[#D45129] rounded-lg flex items-center justify-center">
-          <span className="text-white font-bold text-xl">W</span>
-        </div>
+        <Image src="/W logo.svg" alt="wearHouse logo" width={40} height={40} />
         <span className="text-2xl font-semibold text-[#D45129]">
           wear<span className="text-[#E2764A]">House</span>
         </span>
@@ -26,9 +25,26 @@ export default function Navigation() {
         </Link>
       </nav>
 
-      <button className="ml-8 px-6 py-2 bg-[#d94f6a] text-white rounded-full hover:bg-[#c13f5a] transition text-sm font-medium">
-        User
-      </button>
+      <div className="ml-8">
+        <Dropdown
+          label={
+            <span className="flex items-center gap-3">
+              <div className="w-8 h-8 bg-[#D45129] rounded-full flex items-center justify-center text-white font-semibold">E</div>
+              <span className="text-sm font-medium text-[#7a270f]">User</span>
+            </span>
+          }
+          panelClass="w-40"
+        >
+          <div className="flex flex-col gap-2">
+            <Link
+              href="/logout"
+              className="px-3 py-2 rounded-md text-sm text-[#d86a3f] hover:bg-[#fff2ea] transition"
+            >
+              Log Out
+            </Link>
+          </div>
+        </Dropdown>
+      </div>
     </header>
   );
 }
