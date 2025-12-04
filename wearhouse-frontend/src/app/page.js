@@ -5,22 +5,10 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 
-import TestLogin from "./components/test";
 
 export default function Home() {
   const router = useRouter();
   const [checking, setChecking] = useState(true);
-
-  useEffect(() => {
-    const logged = localStorage.getItem("isLoggedIn");
-    if (!logged) {
-      router.push("/login");
-    } else {
-      setChecking(false);
-    }
-  }, [router]);
-
-  if (checking) return null;
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-[#FBE7CA] to-[#F2BECB]">
