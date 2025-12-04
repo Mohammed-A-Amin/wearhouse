@@ -5,6 +5,8 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 
+import TestLogin from "./components/test";
+
 export default function Home() {
   const router = useRouter();
   const [checking, setChecking] = useState(true);

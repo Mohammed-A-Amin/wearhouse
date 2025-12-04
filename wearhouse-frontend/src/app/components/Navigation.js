@@ -1,8 +1,11 @@
 "use client";
-
 import Image from "next/image";
 import Link from "next/link";
+import { UserButton } from "@clerk/nextjs";
+
 import Dropdown from "./Dropdown";
+import { UserButton } from "@clerk/nextjs";
+
 
 export default function Navigation() {
   return (
@@ -25,26 +28,9 @@ export default function Navigation() {
         </Link>
       </nav>
 
-      <div className="ml-8">
-        <Dropdown
-          label={
-            <span className="flex items-center gap-3">
-              <div className="w-8 h-8 bg-[#D45129] rounded-full flex items-center justify-center text-white font-semibold">E</div>
-              <span className="text-sm font-medium text-[#7a270f]">User</span>
-            </span>
-          }
-          panelClass="w-40"
-        >
-          <div className="flex flex-col gap-2">
-            <Link
-              href="/logout"
-              className="px-3 py-2 rounded-md text-sm text-[#d86a3f] hover:bg-[#fff2ea] transition"
-            >
-              Log Out
-            </Link>
-          </div>
-        </Dropdown>
-      </div>
+      <button className="ml-8 text-white rounded-full transition text-sm font-medium">
+        <UserButton></UserButton>
+      </button>
     </header>
   );
 }
