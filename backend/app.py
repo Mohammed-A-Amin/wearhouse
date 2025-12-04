@@ -62,6 +62,38 @@ def get_my_data():
         print(f"Auth Error: {e}")
         return jsonify({"error": "Invalid Session"}), 401
 
+@app.route('/api/closet/add', methods=['POST'])
+def add_to_closet():
+    auth_header = request.headers.get('Authorization')
+    if not auth_header:
+        return jsonify({"error": "No token provided"}), 401
+    
+    try:
+        token = auth_header.split(" ")[1]
+        payload = jwt.decode(token, options={"verify_signature": False})
+        user_id = payload.get("sub")
+        
+        data = request.json
+        items_to_add = data.get('items', [])
+
+        if not items_to_add:
+            return jsonify({"message": "No items to add"}), 400
+
+        result = db.users.update_one(
+            {"_id": user_id},
+            {"$addToSet": {"closet": {"$each": items_to_add}}}
+        )
+
+        return jsonify({
+            "success": True, 
+            "message": f"Added {len(items_to_add)} items to closet",
+            "modified_count": result.modified_count
+        }), 200
+
+    except Exception as e:
+        print(f"Error adding to closet: {e}")
+        return jsonify({"error": str(e)}), 500
+
 @app.route('/api/health', methods=['GET'])
 def health_check():
     """Health check endpoint"""
