@@ -8,6 +8,7 @@ import {
   SignedOut,
 } from '@clerk/nextjs'
 import SignedOutPage from "./pages/SignedOutPage/SignedOutPage";
+import Sync from "./components/Sync";
 
 
 const geistSans = Geist({
@@ -37,6 +38,7 @@ export default function RootLayout({ children }) {
         </SignedOut>
         <SignedIn>
           {children}
+          <Sync></Sync>
         </SignedIn>
         </body>
       </html>

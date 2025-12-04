@@ -1,5 +1,4 @@
 "use client";
-
 import Navigation from "./components/Navigation";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
@@ -9,7 +8,6 @@ import { useEffect, useState } from "react";
 export default function Home() {
   const router = useRouter();
   const [checking, setChecking] = useState(true);
-
   return (
     <div className="min-h-screen bg-gradient-to-b from-[#FBE7CA] to-[#F2BECB]">
       <Navigation />

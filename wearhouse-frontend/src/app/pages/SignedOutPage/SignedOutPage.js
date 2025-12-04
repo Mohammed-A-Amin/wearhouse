@@ -3,7 +3,7 @@ import './SignedOutPage.css';
 export default function SignedOutPage(){
     return (
         <div className="signed-out">
-            <SignUp></SignUp>
+            <SignUp routing="hash"></SignUp>
         </div>
     )
 }
