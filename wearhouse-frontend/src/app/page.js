@@ -3,11 +3,65 @@ import Navigation from "./components/Navigation";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
-
+import { useAuth, useUser } from "@clerk/nextjs";
+import { redirect } from "next/navigation";
 
 export default function Home() {
+  const { getToken, isSignedIn } = useAuth();
+  const { user, isLoaded } = useUser();
+  const [userData, setUserData] = useState(null);
+  const [isSyncing, setIsSyncing] = useState(true);
   const router = useRouter();
-  const [checking, setChecking] = useState(true);
+  
+  useEffect(() => {
+    if (!isLoaded || !isSignedIn) return;
+
+    if (!isSignedIn) {
+      router.push("/sign-in");
+      return;
+    }
+
+    const syncUser = async () => {
+      try {
+        const token = await getToken();
+        const res = await fetch("http://127.0.0.1:8080/api/me", {
+          method: "GET", 
+          headers: {
+            "Authorization": `Bearer ${token}`,
+            "Content-Type": "application/json", 
+          },
+        });
+
+        if (res.ok) {
+           const data = await res.json();
+           setUserData(data); 
+        } else {
+           console.error("Failed to sync");
+        }
+      } catch (err) {
+        console.error("Error syncing:", err);
+      }
+      finally{
+        setIsSyncing(false)
+      }
+    };
+
+    syncUser();
+
+  }, [isLoaded, isSignedIn, getToken, router]);
+  if (!isLoaded) {
+    return <div>Loading...</div>;
+  }
+
+  if (isSyncing){
+    return <div>Loading...</div>
+  }
+  if (!isSignedIn) {
+    router.push("/sign-in");
+    return null; 
+  }
+
+
   return (
     <div className="min-h-screen bg-gradient-to-b from-[#FBE7CA] to-[#F2BECB]">
       <Navigation />
@@ -16,7 +70,7 @@ export default function Home() {
         {/* Hero Section */}
         <div className="text-center max-w-4xl mx-auto mb-12">
           <h1 className="text-6xl font-bold text-[#D45129] mb-6">
-            Welcome to <span className="text-[#E2764A]">wear</span>House
+            Welcome to <span className="text-[#E2764A]">wear</span>House, {user?.username}
           </h1>
           <p className="text-xl text-[#a4432f] mb-8 leading-relaxed">
             Your personal wardrobe assistant. Organize your closet, discover new outfits,
