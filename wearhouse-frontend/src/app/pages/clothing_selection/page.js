@@ -5,10 +5,12 @@ import FilterSidebar from "../../components/FilterSidebar";
 import Dropdown from "../../components/Dropdown";
 import Navigation from "../../components/Navigation";
 import Image from "next/image";
+import { useAuth } from "@clerk/nextjs";
 
 const MOCK_HISTORY = ["Hoodie", "Sneakers", "Jeans", "Jacket", "Hat"];
 
 export default function Page() {
+  const { getToken, isSignedIn } = useAuth();
   const [items, setItems] = useState([]);
   const [selected, setSelected] = useState(new Set());
   const [filters, setFilters] = useState({ category: "", gender: "" });
@@ -20,6 +22,39 @@ export default function Page() {
       .then(data => setItems(data.Sheet1))
       .catch(console.error);
   }, []);
+
+  const handleSaveToCloset = async () => {
+    if (!isSignedIn) {
+      alert("Please sign in to save items.");
+      return;
+    }
+
+    
+    try {
+      const selectedItems = items.filter(item => selected.has(item.id));
+      
+      const token = await getToken();
+
+      const res = await fetch("http://127.0.0.1:8080/api/closet/add", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": `Bearer ${token}`
+        },
+        body: JSON.stringify({ items: selectedItems })
+      });
+
+      if (res.ok) {
+        alert("Items saved to your closet!");
+        setSelected(new Set()); 
+      } else {
+        alert("Failed to save items.");
+      }
+    } catch (error) {
+      console.error("Error saving:", error);
+      alert("An error occurred.");
+    } 
+  };
 
   const toggleSelect = (id) => {
     setSelected(prev => {
@@ -87,6 +122,7 @@ export default function Page() {
             {/* Left: Filter Sidebar */}
             <div>
               <FilterSidebar />
+              <button className="bg-black border-4 border-black color-black" onClick={handleSaveToCloset} >ADD TO THE CLOSET</button>
             </div>
 
             {/* Item Grid */}
