@@ -1,10 +1,20 @@
 "use client";
 
+"use client";
+
 import Navigation from "../components/Navigation";
 import Link from "next/link";
 import Image from "next/image";
+import { useRouter } from "next/navigation";
 
 export default function LogoutPage() {
+  const router = useRouter();
+
+  const handleConfirm = () => {
+    localStorage.removeItem("isLoggedIn");
+    router.push("/login");
+  };
+
   return (
     <div className="min-h-screen bg-gradient-to-b from-[#FBE7CA] to-[#F2BECB] relative overflow-hidden">
       <Navigation />
@@ -46,12 +56,12 @@ export default function LogoutPage() {
                   Cancel
                 </Link>
 
-                <Link
-                  href="/"
+                <button
+                  onClick={handleConfirm}
                   className="px-6 py-3 bg-[#d94f6a] text-white rounded-md font-semibold shadow-md hover:bg-[#c13f5a] transition"
                 >
                   Confirm
-                </Link>
+                </button>
               </div>
             </div>
           </div>

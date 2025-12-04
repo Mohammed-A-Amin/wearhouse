@@ -1,11 +1,29 @@
+"use client";
+
 import Navigation from "./components/Navigation";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
+import { useEffect, useState } from "react";
 
 export default function Home() {
+  const router = useRouter();
+  const [checking, setChecking] = useState(true);
+
+  useEffect(() => {
+    const logged = localStorage.getItem("isLoggedIn");
+    if (!logged) {
+      router.push("/login");
+    } else {
+      setChecking(false);
+    }
+  }, [router]);
+
+  if (checking) return null;
+
   return (
     <div className="min-h-screen bg-gradient-to-b from-[#FBE7CA] to-[#F2BECB]">
       <Navigation />
-      
+
       <main className="flex flex-col items-center justify-center min-h-[calc(100vh-5rem)] px-8">
         {/* Hero Section */}
         <div className="text-center max-w-4xl mx-auto mb-12">
@@ -13,12 +31,12 @@ export default function Home() {
             Welcome to <span className="text-[#E2764A]">wear</span>House
           </h1>
           <p className="text-xl text-[#a4432f] mb-8 leading-relaxed">
-            Your personal wardrobe assistant. Organize your closet, discover new outfits, 
+            Your personal wardrobe assistant. Organize your closet, discover new outfits,
             and never wonder what to wear again.
           </p>
-          
+
           <div className="flex gap-6 justify-center">
-            <Link 
+            <Link
               href="/pages/clothing_selection"
               className="px-8 py-4 bg-[#d94f6a] text-white rounded-full hover:bg-[#c13f5a] transition text-lg font-medium shadow-lg"
             >
@@ -29,7 +47,7 @@ export default function Home() {
             </button>
           </div>
         </div>
-        
+
         {/* Feature Cards */}
         <div className="grid md:grid-cols-3 gap-8 max-w-6xl mx-auto">
           <div className="bg-white/60 backdrop-blur-sm p-8 rounded-xl shadow-lg border border-white/20">
@@ -41,7 +59,7 @@ export default function Home() {
               Keep track of all your clothing items in one digital closet
             </p>
           </div>
-          
+
           <div className="bg-white/60 backdrop-blur-sm p-8 rounded-xl shadow-lg border border-white/20">
             <div className="w-16 h-16 bg-[#E2764A] rounded-full flex items-center justify-center mb-4 mx-auto">
               <span className="text-white text-2xl">✨</span>
@@ -51,7 +69,7 @@ export default function Home() {
               Get AI-powered outfit suggestions based on your wardrobe
             </p>
           </div>
-          
+
           <div className="bg-white/60 backdrop-blur-sm p-8 rounded-xl shadow-lg border border-white/20">
             <div className="w-16 h-16 bg-[#d94f6a] rounded-full flex items-center justify-center mb-4 mx-auto">
               <span className="text-white text-2xl">📱</span>
