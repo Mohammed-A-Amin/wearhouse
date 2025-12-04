@@ -4,15 +4,7 @@ import { useState, useEffect } from "react";
 import FilterSidebar from "../../components/FilterSidebar";
 import Dropdown from "../../components/Dropdown";
 import Navigation from "../../components/Navigation";
-import { useState } from "react";
 import Image from "next/image";
-import Navigation from "@/app/components/Navigation";
-
-const MOCK_ITEMS = Array.from({ length: 20 }).map((_, i) => ({
-  id: i + 1,
-  name: `Item ${i + 1}`,
-  category: i % 2 === 0 ? "Top" : "Bottom",
-}));
 
 const MOCK_HISTORY = ["Hoodie", "Sneakers", "Jeans", "Jacket", "Hat"];
 
