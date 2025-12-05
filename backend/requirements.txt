@@ -6,3 +6,6 @@ pymongo==4.6.1
 google-generativeai==0.3.2
 Werkzeug==3.0.1
 clerk-backend-api
+io
+PIL
+base64
