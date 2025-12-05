@@ -15,6 +15,7 @@ export default function Page() {
   const [generatedImage, setGeneratedImage] = useState(null);
   const [loading, setLoading] = useState(false);
 
+  const [userImage, setUserImage] = useState(null); // <-- NEW
   const [query, setQuery] = useState("");
   const [selected, setSelected] = useState(new Set());
 
@@ -46,7 +47,7 @@ export default function Page() {
   }, [isLoaded, isSignedIn, getToken]);
 
   // -------------------------------------------
-  // Toggle item selection
+  // Toggle item selection (currently unused for API)
   // -------------------------------------------
   const toggleSelect = (id) => {
     setSelected((prev) => {
@@ -61,6 +62,21 @@ export default function Page() {
   );
 
   // -------------------------------------------
+  // Handle user image upload (camera or file)
+  // -------------------------------------------
+  const handleImageUpload = (e) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onload = () => {
+      // data URL: "data:image/png;base64,...."
+      setUserImage(reader.result);
+    };
+    reader.readAsDataURL(file);
+  };
+
+  // -------------------------------------------
   // GENERATE OUTFIT (calls Flask + Gemini)
   // -------------------------------------------
   const handleGenerateOutfit = async () => {
@@ -68,12 +84,18 @@ export default function Page() {
       setLoading(true);
       setGeneratedImage(null);
 
+      // ONLY SEND SELECTED ITEMS
+      const selectedItemsArray = closetItems.filter(item => selected.has(item.id));
+
       const res = await fetch("http://127.0.0.1:8080/api/outfits/generate", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ items: closetItems }),
+        body: JSON.stringify({
+          items: selectedItemsArray,
+          userImage: userImage, // if user uploaded a photo
+        }),
       });
 
       const data = await res.json();
@@ -89,6 +111,7 @@ export default function Page() {
       setLoading(false);
     }
   };
+
 
   if (!isLoaded) return <div>Loading...</div>;
 
@@ -119,9 +142,30 @@ export default function Page() {
           {/* CONTENT GRID */}
           <div className="grid grid-cols-[260px_1fr] gap-6 px-8 py-6">
 
-            {/* LEFT — MANNEQUIN PREVIEW */}
+            {/* LEFT — MANNEQUIN / USER PREVIEW */}
             <div className="flex flex-col items-center">
               <h2 className="text-3xl font-bold text-[#F06728] mb-4">Today’s Outfit</h2>
+
+              {/* User photo upload */}
+              <div className="flex flex-col items-center mb-3">
+                <label className="text-xs font-semibold text-[#C13F5A] mb-1">
+                  Upload / Take a Photo (for try-on)
+                </label>
+                <input
+                  type="file"
+                  accept="image/*"
+                  capture="environment"
+                  onChange={handleImageUpload}
+                  className="text-xs"
+                />
+                {userImage && (
+                  <img
+                    src={userImage}
+                    alt="Your uploaded"
+                    className="mt-2 w-24 h-24 object-cover rounded-md border border-[#C43757]"
+                  />
+                )}
+              </div>
 
               <div className="w-72 h-[500px] bg-[#F4C6D8] border-4 border-[#C43757] flex items-center justify-center overflow-hidden">
                 {generatedImage ? (
@@ -133,7 +177,11 @@ export default function Page() {
                 ) : loading ? (
                   <span className="text-[#C43757] animate-pulse text-lg">Generating...</span>
                 ) : (
-                  <span className="text-[#C43757] opacity-70">No outfit yet</span>
+                  <span className="text-[#C43757] opacity-70 text-center px-4">
+                    No outfit yet.
+                    <br />
+                    Upload a photo above or generate on mannequin.
+                  </span>
                 )}
               </div>
 

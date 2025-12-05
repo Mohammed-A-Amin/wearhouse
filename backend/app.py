@@ -131,11 +131,26 @@ def generate_outfit():
     try:
         data = request.json
         items = data.get("items", [])
+        user_image_b64 = data.get("userImage")
 
         if len(items) == 0:
             return jsonify({"error": "No items provided"}), 400
 
         print(f"Generating outfit for {len(items)} items...")
+
+        # Optional: decode user image (for personal try-on)
+        user_image_obj = None
+        if user_image_b64:
+            try:
+                # Strip data URL prefix if present
+                if "," in user_image_b64:
+                    user_image_b64 = user_image_b64.split(",")[1]
+                user_bytes = base64.b64decode(user_image_b64)
+                user_image_obj = Image.open(BytesIO(user_bytes))
+                print("User image loaded successfully.")
+            except Exception as e:
+                print(f"Failed to decode user image, falling back to mannequin: {e}")
+                user_image_obj = None
 
         # Step 1 — Load each clothing image
         images = []
@@ -158,16 +173,39 @@ def generate_outfit():
             item.get("productDisplayName", "clothing item") for item in items
         ]
 
-        prompt = "Create a full-body mannequin wearing ALL of the following items:\n"
+        if user_image_obj:
+            prompt = "Use the PERSON in the provided photo as the model.\n"
+            prompt += "Do NOT change their face, body shape, skin tone, or pose.\n"
+            prompt += "Overlay and fit ALL of the following clothing items naturally on their body:\n"
+        else:
+            prompt = "Create a full-body mannequin wearing ALL of the following items:\n"
+
         for name in item_names:
             prompt += f"- {name}\n"
 
-        prompt += """
+        if user_image_obj:
+            prompt += """
+Match the lighting, perspective, and shadows of the original person photo.
+Produce ONE final image of the same person wearing the entire outfit.
+High-quality, realistic virtual try-on.
+"""
+        else:
+            prompt += """
 The output must be ONE outfit image. Fit clothes naturally on the mannequin.
 White studio background. Realistic lighting. Professional fashion look.
 """
 
-        # Step 3 — Call Gemini
+        # Step 3 — Prepare payload for Gemini
+        payload = [prompt]
+
+        # If we have a user photo, include it first
+        if user_image_obj:
+            payload.append(user_image_obj)
+
+        # Then add clothing item images
+        payload += images
+
+        # Step 4 — Call Gemini
         chat = client.chats.create(
             model="gemini-3-pro-image-preview",
             config=types.GenerateContentConfig(
@@ -175,17 +213,15 @@ White studio background. Realistic lighting. Professional fashion look.
             )
         )
 
-        response = chat.send_message([prompt] + images)
+        response = chat.send_message(payload)
 
-        # Step 4 — Extract output image
+        # Step 5 — Extract output image bytes
         generated_b64 = None
-
         for part in response.parts:
             if hasattr(part, "inline_data") and part.inline_data:
                 image_bytes = part.inline_data.data  # RAW BYTES
                 generated_b64 = base64.b64encode(image_bytes).decode("utf-8")
                 break
-
 
         if not generated_b64:
             return jsonify({"error": "Gemini returned no image"}), 500
@@ -193,7 +229,8 @@ White studio background. Realistic lighting. Professional fashion look.
         return jsonify({
             "success": True,
             "generated_image": generated_b64,
-            "item_count": len(items)
+            "item_count": len(items),
+            "used_user_image": bool(user_image_obj),
         }), 200
 
     except Exception as e:
@@ -212,6 +249,9 @@ def health_check():
     except Exception as e:
         db_status = f'disconnected: {str(e)}'
     
+        # Note: mongo here is a MongoClient, not a Flask-PyMongo instance.
+        # If this errors, you can ignore or adjust, but it doesn't affect core flow.
+
     return jsonify({
         'status': 'healthy',
         'message': 'Wearhouse API is running',
