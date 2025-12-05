@@ -5,10 +5,13 @@ import FilterSidebar from "../../components/FilterSidebar";
 import Dropdown from "../../components/Dropdown";
 import Navigation from "../../components/Navigation";
 import Image from "next/image";
+import { useAuth } from "@clerk/nextjs";
+import ItemGrid from "@/app/components/ItemGrid";
 
 const MOCK_HISTORY = ["Hoodie", "Sneakers", "Jeans", "Jacket", "Hat"];
 
 export default function Page() {
+  const { getToken, isSignedIn } = useAuth();
   const [items, setItems] = useState([]);
   const [selected, setSelected] = useState(new Set());
   const [filters, setFilters] = useState({ category: "", gender: "" });
@@ -20,6 +23,39 @@ export default function Page() {
       .then(data => setItems(data.Sheet1))
       .catch(console.error);
   }, []);
+
+  const handleSaveToCloset = async () => {
+    if (!isSignedIn) {
+      alert("Please sign in to save items.");
+      return;
+    }
+
+    
+    try {
+      const selectedItems = items.filter(item => selected.has(item.id));
+      
+      const token = await getToken();
+
+      const res = await fetch("http://127.0.0.1:8080/api/closet/add", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": `Bearer ${token}`
+        },
+        body: JSON.stringify({ items: selectedItems })
+      });
+
+      if (res.ok) {
+        alert("Items saved to your closet!");
+        setSelected(new Set()); 
+      } else {
+        alert("Failed to save items.");
+      }
+    } catch (error) {
+      console.error("Error saving:", error);
+      alert("An error occurred.");
+    } 
+  };
 
   const toggleSelect = (id) => {
     setSelected(prev => {
@@ -87,6 +123,7 @@ export default function Page() {
             {/* Left: Filter Sidebar */}
             <div>
               <FilterSidebar />
+              <button className="bg-black border-4 border-black color-black" onClick={handleSaveToCloset} >ADD TO THE CLOSET</button>
             </div>
 
             {/* Item Grid */}
@@ -137,37 +174,3 @@ function SearchHistory({ history, setQuery }) {
   );
 }
 
-function ItemGrid({ items, selected, toggleSelect }) {
-  const baseUrl = "http://assets.myntassets.com/v1/images/style/properties/"
-  return (
-    <div className="grid grid-cols-4 gap-4">
-      {items.map((item) => {
-        const isSelected = selected.has(item.id);
-        return (
-          <button
-            key={item.id}
-            onClick={() => toggleSelect(item.id)}
-            className={`relative bg-orange-100 border border-orange-300 hover:shadow flex flex-col justify-between h-[320px]`}
-          >
-            <img 
-            src={item.imageLink}
-            alt={item.productDisplayName}
-            className="object-cover w-full h-64"
-            />
-            <div className="px-2 py-1 text-left text-sm text-gray-700">
-              <div className="font-medium">{item.productDisplayName}</div>
-              <div className="text-xs text-gray-500">{item.masterCategory}</div>
-              <div className="text-xs text-gray-500">{item.gender}</div>
-            </div>
-
-            {isSelected && (
-              <div className="absolute top-1 right-1 bg-blue-500 text-white w-6 h-6 flex items-center justify-center rounded-full text-xs">
-                ✓
-              </div>
-            )}
-          </button>
-        );
-      })}
-    </div>
-  );
-}

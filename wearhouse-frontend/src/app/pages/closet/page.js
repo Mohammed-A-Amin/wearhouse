@@ -1,8 +1,11 @@
 "use client";
 
 import { useState } from "react";
+import { useEffect } from "react";
 import Dropdown from "../../components/Dropdown";
 import Navigation from "../../components/Navigation";
+import { useAuth } from "@clerk/nextjs";
+import ItemGrid from "@/app/components/ItemGrid";
 
 const MOCK_ITEMS = Array.from({ length: 20 }).map((_, i) => ({
   id: i + 1,
@@ -13,8 +16,39 @@ const MOCK_ITEMS = Array.from({ length: 20 }).map((_, i) => ({
 const MOCK_HISTORY = ["Hoodie", "Sneakers", "Jeans", "Jacket", "Hat"];
 
 export default function Page() {
+
+  const { getToken, isLoaded, isSignedIn } = useAuth();
+  
+  const [closetItems, setClosetItems] = useState([]);
+  
   const [query, setQuery] = useState("");
   const [selected, setSelected] = useState(new Set());
+
+  useEffect(() => {
+    const fetchCloset = async () => {
+      if (!isLoaded || !isSignedIn) return;
+
+      try {
+        const token = await getToken();
+        const res = await fetch("http://127.0.0.1:8080/api/me", {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
+
+        if (res.ok) {
+          const userData = await res.json();
+          setClosetItems(userData.closet || []);
+        }
+      } catch (error) {
+        console.error("Failed to load closet:", error);
+      } finally {
+        console.log(closetItems)
+      }
+    };
+
+    fetchCloset();
+  }, [isLoaded, isSignedIn, getToken]);
 
   const toggleSelect = (id) => {
     setSelected((prev) => {
@@ -24,9 +58,12 @@ export default function Page() {
     });
   };
 
-  const filteredItems = MOCK_ITEMS.filter((item) =>
-    item.name.toLowerCase().includes(query.toLowerCase())
+  const filteredItems = closetItems.filter((item) =>
+    item.productDisplayName?.toLowerCase().includes(query.toLowerCase())
   );
+
+
+  if (!isLoaded) return <div>Loading...</div>;
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-[#FBE7CA] to-[#F2BECB] flex flex-col">
@@ -158,36 +195,6 @@ function SearchHistory({ history, setQuery }) {
           {tag}
         </button>
       ))}
-    </div>
-  );
-}
-
-function ItemGrid({ items, selected, toggleSelect }) {
-  return (
-    <div className="grid grid-cols-4 gap-4">
-      {items.map((item) => {
-        const isSelected = selected.has(item.id);
-        return (
-          <button
-            key={item.id}
-            onClick={() => toggleSelect(item.id)}
-            className={`relative bg-orange-100 border border-orange-300 hover:shadow
-              ${isSelected ? "ring-2 ring-blue-500" : ""}`}
-          >
-            <div className="aspect-[4/5] bg-orange-200" />
-            <div className="px-2 py-1 text-left text-sm text-gray-700">
-              <div className="font-medium">{item.name}</div>
-              <div className="text-xs text-gray-500">{item.category}</div>
-            </div>
-
-            {isSelected && (
-              <div className="absolute top-1 right-1 bg-blue-500 text-white w-6 h-6 flex items-center justify-center rounded-full text-xs">
-                ✓
-              </div>
-            )}
-          </button>
-        );
-      })}
     </div>
   );
 }
