@@ -8,21 +8,40 @@ from pymongo import MongoClient
 from config import Config
 from clerk_backend_api import Clerk
 import certifi
+import requests
+from io import BytesIO
+from PIL import Image
+import base64
+
+# === Gemini imports (DO NOT MODIFY import style per your request) ===
+from google import genai
+from google.genai import types
+
+# ================================================================
 
 app = Flask(__name__)
 app.config.from_object(Config)
 CORS(app)
 load_dotenv()
+
 MONGO_URI = os.getenv("MONGO_URI")
 DB_NAME = str(os.getenv("DB_NAME"))
 CLERK_SECRET_KEY = os.getenv("CLERK_SECRET_KEY")
 PORT = os.getenv("PORT")
 
+# Gemini client
+API_KEY = os.getenv("GEMINI_API_KEY")
+client = genai.Client(api_key=API_KEY)
+
+# Mongo
 clerk_sdk = Clerk(bearer_auth=CLERK_SECRET_KEY)
 mongo = MongoClient(MONGO_URI, tlsCAFile=certifi.where())
 db = mongo[DB_NAME]
 
 
+# --------------------------------------------------------------
+# AUTH – GET CURRENT USER
+# --------------------------------------------------------------
 @app.route('/api/me', methods=['GET'])
 def get_my_data():
     auth_header = request.headers.get('Authorization')
@@ -38,7 +57,7 @@ def get_my_data():
 
         session = clerk_sdk.sessions.get(session_id=session_id)
         if session.status != "active":
-             return jsonify({"error": "Session inactive"}), 401
+            return jsonify({"error": "Session inactive"}), 401
 
         user = db.users.find_one({"_id": user_id})
         
@@ -62,6 +81,10 @@ def get_my_data():
         print(f"Auth Error: {e}")
         return jsonify({"error": "Invalid Session"}), 401
 
+
+# --------------------------------------------------------------
+# ADD ITEMS TO CLOSET
+# --------------------------------------------------------------
 @app.route('/api/closet/add', methods=['POST'])
 def add_to_closet():
     auth_header = request.headers.get('Authorization')
@@ -94,9 +117,95 @@ def add_to_closet():
         print(f"Error adding to closet: {e}")
         return jsonify({"error": str(e)}), 500
 
+
+# --------------------------------------------------------------
+# GEMINI OUTFIT GENERATION ENDPOINT
+# --------------------------------------------------------------
+def download_image(url):
+    resp = requests.get(url, timeout=10)
+    resp.raise_for_status()
+    return Image.open(BytesIO(resp.content))
+
+@app.route('/api/outfits/generate', methods=['POST'])
+def generate_outfit():
+    try:
+        data = request.json
+        items = data.get("items", [])
+
+        if len(items) == 0:
+            return jsonify({"error": "No items provided"}), 400
+
+        print(f"Generating outfit for {len(items)} items...")
+
+        # Step 1 — Load each clothing image
+        images = []
+        for item in items:
+            url = item.get("imageLink")
+            if not url:
+                continue
+
+            try:
+                img = download_image(url)
+                images.append(img)
+            except Exception as e:
+                print(f"Failed to fetch image {url}: {e}")
+
+        if len(images) == 0:
+            return jsonify({"error": "No images downloaded"}), 400
+
+        # Step 2 — Build prompt
+        item_names = [
+            item.get("productDisplayName", "clothing item") for item in items
+        ]
+
+        prompt = "Create a full-body mannequin wearing ALL of the following items:\n"
+        for name in item_names:
+            prompt += f"- {name}\n"
+
+        prompt += """
+The output must be ONE outfit image. Fit clothes naturally on the mannequin.
+White studio background. Realistic lighting. Professional fashion look.
+"""
+
+        # Step 3 — Call Gemini
+        chat = client.chats.create(
+            model="gemini-3-pro-image-preview",
+            config=types.GenerateContentConfig(
+                response_modalities=["IMAGE"]
+            )
+        )
+
+        response = chat.send_message([prompt] + images)
+
+        # Step 4 — Extract output image
+        generated_b64 = None
+
+        for part in response.parts:
+            if hasattr(part, "inline_data") and part.inline_data:
+                image_bytes = part.inline_data.data  # RAW BYTES
+                generated_b64 = base64.b64encode(image_bytes).decode("utf-8")
+                break
+
+
+        if not generated_b64:
+            return jsonify({"error": "Gemini returned no image"}), 500
+
+        return jsonify({
+            "success": True,
+            "generated_image": generated_b64,
+            "item_count": len(items)
+        }), 200
+
+    except Exception as e:
+        print("Gemini outfit error:", e)
+        return jsonify({"error": str(e)}), 500
+
+
+# --------------------------------------------------------------
+# HEALTH
+# --------------------------------------------------------------
 @app.route('/api/health', methods=['GET'])
 def health_check():
-    """Health check endpoint"""
     try:
         mongo.db.command('ping')
         db_status = 'connected'
@@ -104,18 +213,25 @@ def health_check():
         db_status = f'disconnected: {str(e)}'
     
     return jsonify({
-        'status': 'healthy', 
+        'status': 'healthy',
         'message': 'Wearhouse API is running',
         'database': db_status
     }), 200
 
+
+# --------------------------------------------------------------
+# ROOT
+# --------------------------------------------------------------
 @app.route('/api', methods=['GET'])
 def api_root():
-    """API root endpoint"""
     return jsonify({
         'message': 'Welcome to Wearhouse API',
         'version': '1.0.0'
     }), 200
 
+
+# --------------------------------------------------------------
+# RUN
+# --------------------------------------------------------------
 if __name__ == '__main__':
     app.run(debug=True, host='0.0.0.0', port=PORT)
