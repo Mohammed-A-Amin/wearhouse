@@ -169,31 +169,23 @@ def generate_outfit():
             return jsonify({"error": "No images downloaded"}), 400
 
         # Step 2 — Build prompt
-        item_names = [
-            item.get("productDisplayName", "clothing item") for item in items
-        ]
-
+        # IMAGE-ONLY PROMPT
         if user_image_obj:
-            prompt = "Use the PERSON in the provided photo as the model.\n"
-            prompt += "Do NOT change their face, body shape, skin tone, or pose.\n"
-            prompt += "Overlay and fit ALL of the following clothing items naturally on their body:\n"
+            prompt = """
+        Use the PERSON in the provided photo as the model.
+        Do NOT change their face, body shape, skin tone, or pose.
+        Fit the provided clothing ITEM IMAGES directly onto this person.
+        Do NOT make up or alter clothing details.
+        Create ONE realistic try-on image.
+        """
         else:
-            prompt = "Create a full-body mannequin wearing ALL of the following items:\n"
+            prompt = """
+        Use ONLY the provided clothing images to dress a mannequin.
+        Do NOT invent new clothes or modify them.
+        Output ONE single final outfit image.
+        White studio background.
+        """
 
-        for name in item_names:
-            prompt += f"- {name}\n"
-
-        if user_image_obj:
-            prompt += """
-Match the lighting, perspective, and shadows of the original person photo.
-Produce ONE final image of the same person wearing the entire outfit.
-High-quality, realistic virtual try-on.
-"""
-        else:
-            prompt += """
-The output must be ONE outfit image. Fit clothes naturally on the mannequin.
-White studio background. Realistic lighting. Professional fashion look.
-"""
 
         # Step 3 — Prepare payload for Gemini
         payload = [prompt]
